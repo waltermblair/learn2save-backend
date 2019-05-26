@@ -1,0 +1,222 @@
+openapi: 3.0.1
+info:
+  title: learn2save API
+  description: 'This is the learn2save backend API. For
+    this sample, you can use the api key `special-key` to test the authorization     filters.'
+  contact:
+    email: waltermblair@gmail.com
+  version: 1.0.0
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+- url: https://tbd/v1
+tags:
+- name: accounts
+  description: Manage user accounts
+paths:
+  /accounts:
+    post:
+      tags:
+      - accounts
+      summary: Add a new account to the store
+      operationId: addAccount
+      requestBody:
+        description: Account object that needs to be added to the store
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountCreateRequestBody'
+        required: true
+      responses:
+        201:
+          description: Created Succesfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: 
+                    type: integer
+        405:
+          description: Invalid input
+          content: {}
+      security:
+      - api_auth:
+        - write:accounts
+        - read:accounts
+  /accounts/{accountID}:
+    get:
+      tags:
+      - accounts
+      summary: Find account by ID
+      description: Returns a single account
+      operationId: getAccountById
+      parameters:
+      - name: accountID
+        in: path
+        description: ID of account to return
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountResponseBody'
+        400:
+          description: Invalid ID supplied
+          content: {}
+        404:
+          description: Account not found
+          content: {}
+      security:
+      - api_auth:
+        - write:accounts
+        - read:accounts
+    put:
+      tags:
+      - accounts
+      summary: Updates an account in the store with form data
+      operationId: updateAccountWithForm
+      parameters:
+      - name: accountID
+        in: path
+        description: ID of account that needs to be updated
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountUpdateRequestBody'
+      responses:
+        200:
+          description: Account updated successfully
+          content: {}
+        405:
+          description: Invalid input
+          content: {}
+      security:
+      - api_auth:
+        - write:accounts
+        - read:accounts
+    delete:
+      tags:
+      - accounts
+      summary: Deletes an account
+      operationId: deleteAccount
+      parameters:
+      - name: accountID
+        in: path
+        description: Account id to delete
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: Deleted successfully
+          content: {}
+        400:
+          description: Invalid ID supplied
+          content: {}
+        404:
+          description: Account not found
+          content: {}
+      security:
+      - api_auth:
+        - write:accounts
+        - read:accounts
+  /accounts/{accountID}/transactions:
+    get:
+      tags:
+      - accounts
+      summary: Find account transactions by ID
+      description: Returns transactions for a single account
+      operationId: getAccountTransactionsById
+      parameters:
+      - name: accountID
+        in: path
+        description: ID of account to return
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountTransactionsResponseBody'
+        400:
+          description: Invalid ID supplied
+          content: {}
+        404:
+          description: Account not found
+          content: {}
+      security:
+      - api_auth:
+        - write:accounts
+        - read:accounts
+components:
+  schemas:
+    AccountResponseBody:
+      type: object
+      properties:
+        balance:
+          type: number
+          format: float
+        last_transaction_at:
+          type: string
+          format: datetime
+        last_updated_at:
+          type: string
+          format: datetime
+        created_at:
+          type: string
+          format: datetime
+    AccountCreateRequestBody:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+    AccountUpdateRequestBody:
+      type: object
+      properties:
+        balance:
+          type: number
+          format: float
+    AccountTransactionsResponseBody:
+      type: array
+      items:
+        type: object
+        properties:
+          created_at:
+            type: string
+            format: datetime
+          created_by:
+            type: string
+          description:
+            type: string
+  securitySchemes:
+    api_auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://TBD/oauth
+          scopes:
+            write:accounts: modify accounts
+            read:accounts: read your accounts
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header
