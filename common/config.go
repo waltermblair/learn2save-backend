@@ -5,6 +5,8 @@ import (
 )
 
 type Config struct {
+	ReactURL string `envconfig:"REACT_URL"`
+
 	MySqlDSN string `envconfig:"MYSQL_DSN"`
 
 	GetAccountByIDQuery string `envconfig:"GET_ACCOUNT_BY_ID_QUERY"`
